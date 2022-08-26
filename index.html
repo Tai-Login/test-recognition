@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Hello world!</h1>
+        <textarea id="textarea" name="textarea"></textarea>
+        <button id="start">Start</button>
+        <button id="end">End</button>
+        <script>
+            const btnStart = document.querySelector("#start");
+            const btnEnd = document.querySelector("#end");
+            const textarea = document.querySelector("#textarea");
+            if (!("webkitSpeechRecognition" in window)) {
+                alert("Unable to use the Speech Recognition API");
+            }
+
+            // Or
+
+            if (!window.hasOwnProperty("webkitSpeechRecognition")) {
+                alert("Unable to use the Speech Recognition API");
+            }
+
+            // Or
+
+            if (typeof webkitSpeechRecognition != "function") {
+                alert("Unable to use the Speech Recognition API");
+            }
+            // Create a new instance of SpeechRecognition
+            var recognition = new webkitSpeechRecognition();
+            // Define whether continuous results are returned for each recognition
+            // or only a single result. Defaults to false
+            recognition.continuous = true;
+            // Controls whether interim results should be returned
+            // Interim results are results that are not yet final
+            // (e.g. the SpeechRecognitionResult.isFinal property is false.)
+            recognition.interimResults = true;
+            // Returns and sets the language of the current SpeechRecognition.
+            // If not specified, this defaults to the HTML lang attribute value
+            // or the user agent's language setting if that isn't set either.
+            // There are a lot of supported languages (go to supported languages at the end of the article)
+            recognition.lang = "vi-Vi";
+            recognition.onerror = function (event) {
+                console.error(event);
+            };
+            // will run when the speech recognition
+            // service has began listening to incoming audio
+            recognition.onstart = function () {
+                console.log("Speech recognition service has started");
+            };
+            // This event is triggered when the speech recognition service
+            // returns a result — a word or phrase has been positively
+            //recognized and this has been communicated back to your app
+            recognition.onresult = function (event) {
+                var interim_transcript = "";
+                var final_transcript = "";
+
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    // Verify if the recognized text is the last with the isFinal property
+                    if (event.results[i].isFinal) {
+                        final_transcript += event.results[i][0].transcript;
+                    } else {
+                        interim_transcript += event.results[i][0].transcript;
+                    }
+                }
+
+                // Choose which result may be useful for you
+
+                console.log("Interim: ", interim_transcript);
+                textarea.innerHTML = final_transcript;
+                console.log("Final: ", final_transcript);
+
+                console.log("Simple: ", event.results[0][0].transcript);
+            };
+            btnStart.addEventListener("click", function () {
+                recognition.start();
+                console.log("recognition started");
+            });
+            btnEnd.addEventListener("click", function () {
+                recognition.stop();
+                console.log("recognition stopped");
+            });
+            // setTimeout(() => {
+            //     recognition.stop();
+            //     console.log("recognition stopped");
+            // }, 5000);
+        </script>
+    </body>
+</html>
